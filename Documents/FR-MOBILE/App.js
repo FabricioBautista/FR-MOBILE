@@ -1,20 +1,38 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import LoginScreen from './src/LoginScreen';
+import RegisterScreen from './src/RegisterScreen';
 
-export default function App() {
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const AuthStack = ({ setIsLoggedIn }) => (
+  <Stack.Navigator initialRouteName="Login">
+    <Stack.Screen name="Login">
+      {props => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+    </Stack.Screen>
+    <Stack.Screen name="Register" component={RegisterScreen} />
+  </Stack.Navigator>
+);
+
+const AppTabs = ({ setIsLoggedIn }) => (
+  <Tab.Navigator initialRouteName='Courses'>
+    <Tab.Screen name="Courses">
+      {props => <CoursesScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+    </Tab.Screen>
+  </Tab.Navigator>
+);
+
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+    <NavigationContainer>
+      {isLoggedIn ? <AppTabs setIsLoggedIn={setIsLoggedIn} /> : <AuthStack setIsLoggedIn={setIsLoggedIn}/>}
+    </NavigationContainer>
+  	);
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
