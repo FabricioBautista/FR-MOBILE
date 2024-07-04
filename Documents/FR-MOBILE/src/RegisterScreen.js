@@ -1,100 +1,69 @@
+// RegisterScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import { register } from './api';
 
-const RegisterScreen = ({navigation}) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isCompany, setIsTeacher] = useState(false);
+const RegisterScreen = () => {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
 
-  const handleRegister = async () => {
-    try {
-      await register(name, email, password, isCompany);
-      navigation.navigate('Login');
-    } catch (error) {
-      console.error('Registration failed', error);
-    }
-  };
+    const handleRegister = async () => {
+        try {
+            const userData = { name, email, password };
+            const result = await register(userData);
+            console.log('Registration successful:', result);
+        } catch (err) {
+            console.error('Registration failed:', err);
+            setError('Registration failed. Please try again.');
+        }
+    };
 
-  const toggleCheckbox = () => {
-    setIsTeacher(!isCompany);
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text>Name:</Text>
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder="Enter your name"
-      />
-      <Text>Email:</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Enter your email"
-      />
-      <Text>Password:</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Enter your password"
-        secureTextEntry
-      />
-      <View style={styles.checkboxContainer}>
-        <TouchableOpacity onPress={toggleCheckbox} style={styles.checkbox}>
-          {isCompany && <View style={styles.checked} />}
-        </TouchableOpacity>
-        <Text style={styles.checkboxLabel}>Are you a Company?</Text>
-      </View>
-      <Button title="Register" onPress={handleRegister} />
-      <Button
-        title="Go to Login"
-        onPress={() => navigation.navigate('Login')}
-      />
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <TextInput
+                placeholder="Name"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+            />
+            <TextInput
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                style={styles.input}
+            />
+            <TextInput
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                style={styles.input}
+            />
+            <Button title="Register" onPress={handleRegister} />
+            {error && <Text style={styles.error}>{error}</Text>}
+        </View>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: 'gray',
-    marginRight: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checked: {
-    width: 12,
-    height: 12,
-    backgroundColor: 'blue',
-  },
-  checkboxLabel: {
-    fontSize: 16,
-  },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 16,
+    },
+    input: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginBottom: 12,
+        paddingHorizontal: 8,
+    },
+    error: {
+        color: 'red',
+        marginTop: 16,
+    },
 });
 
 export default RegisterScreen;
