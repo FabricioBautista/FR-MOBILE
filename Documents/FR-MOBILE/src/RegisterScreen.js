@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
-import { register } from './api';
+import { register } from './Api';
 
 const RegisterScreen = () => {
     const [name, setName] = useState('');

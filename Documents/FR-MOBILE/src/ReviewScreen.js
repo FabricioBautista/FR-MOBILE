@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
-import { getAllReseñas, createReseña } from './api';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { getAllReseñas, createReseña } from './Api';
 
-const ReviewScreen = () => {
+const ReviewScreen = ({ userId, restaurantId }) => {
     const [reseñas, setReseñas] = useState([]);
     const [valoracion, setValoracion] = useState('');
     const [comentario, setComentario] = useState('');
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -13,12 +14,16 @@ const ReviewScreen = () => {
     }, []);
 
     const fetchReseñas = async () => {
+        setLoading(true);
+        setError(null);
         try {
-            const fetchedReseñas = await getAllReseñas();
+            const fetchedReseñas = await getAllReseñas(restaurantId);
             setReseñas(fetchedReseñas);
         } catch (err) {
             console.error('Error fetching reseñas:', err);
             setError('Failed to fetch reseñas.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -29,12 +34,14 @@ const ReviewScreen = () => {
         }
 
         const reseñaData = {
-            usuario: { id: 1 },  // Reemplaza con el ID del usuario autenticado
-            restaurante: { id: 1 },  // Reemplaza con el ID del restaurante seleccionado
+            usuario: { id: userId },
+            restaurante: { id: restaurantId },
             valoracion: parseInt(valoracion),
             comentario: comentario,
         };
 
+        setLoading(true);
+        setError(null);
         try {
             await createReseña(reseñaData);
             setValoracion('');
@@ -43,6 +50,8 @@ const ReviewScreen = () => {
         } catch (err) {
             console.error('Error creating reseña:', err);
             setError('Failed to create reseña.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -63,16 +72,20 @@ const ReviewScreen = () => {
             />
             <Button title="Submit Review" onPress={handleCreateReseña} />
             {error && <Text style={styles.error}>{error}</Text>}
-            <FlatList
-                data={reseñas}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.reseñaItem}>
-                        <Text style={styles.valoracion}>Valoración: {item.valoracion}</Text>
-                        <Text style={styles.comentario}>Comentario: {item.comentario}</Text>
-                    </View>
-                )}
-            />
+            {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+                <FlatList
+                    data={reseñas}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <View style={styles.reseñaItem}>
+                            <Text style={styles.valoracion}>Valoración: {item.valoracion}</Text>
+                            <Text style={styles.comentario}>Comentario: {item.comentario}</Text>
+                        </View>
+                    )}
+                />
+            )}
         </View>
     );
 };
@@ -80,18 +93,17 @@ const ReviewScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
         padding: 16,
     },
     input: {
-        height: 40,
-        borderColor: 'gray',
         borderWidth: 1,
-        marginBottom: 12,
-        paddingHorizontal: 8,
+        padding: 8,
+        marginBottom: 16,
     },
     error: {
         color: 'red',
-        marginTop: 16,
+        marginBottom: 16,
     },
     reseñaItem: {
         borderBottomWidth: 1,
@@ -99,10 +111,11 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
     },
     valoracion: {
+        fontSize: 16,
         fontWeight: 'bold',
     },
     comentario: {
-        fontStyle: 'italic',
+        fontSize: 14,
     },
 });
 
