@@ -1,17 +1,17 @@
-// RegisterScreen.js
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
-import { register } from './api';
+import { register } from './api'; 
 
 const RegisterScreen = () => {
-    const [name, setName] = useState('');
+    const [nombre, setNombre] = useState('');
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(null); 
 
     const handleRegister = async () => {
         try {
-            const userData = { name, email, password };
+            const userData = { nombre, username, email, password };
             const result = await register(userData);
             console.log('Registration successful:', result);
         } catch (err) {
@@ -23,9 +23,15 @@ const RegisterScreen = () => {
     return (
         <View style={styles.container}>
             <TextInput
-                placeholder="Name"
-                value={name}
-                onChangeText={setName}
+                placeholder="Nombre"
+                value={nombre}
+                onChangeText={setNombre}
+                style={styles.input}
+            />
+            <TextInput
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
                 style={styles.input}
             />
             <TextInput

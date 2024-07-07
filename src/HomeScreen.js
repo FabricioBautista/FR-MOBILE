@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
+
 export default function HomeScreen({ navigation }) {
     const handleLogout = async () => {
         await SecureStore.deleteItemAsync('userToken');
